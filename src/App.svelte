@@ -1,30 +1,53 @@
 <script>
-	export let name;
+  import { onMount } from "svelte";
+  import User from "./User.svelte";
+  import UserSearch from "./UserSearch.svelte";
+
+  // create a variable to store our users
+  let users;
+
+  // run this when the app starts
+  onMount(() => {
+    getGitHubUsers();
+  });
+
+  /**
+   * Grab users from GitHub
+   */
+  function getGitHubUsers() {
+    fetch("https://api.github.com/users")
+      .then(resp => resp.json())
+      .then(data => (users = data));
+  }
 </script>
 
-<main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-</main>
-
 <style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
+  .user-list {
+    display: flex;
+    flex-flow: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
+  .user-list li {
+    width: 20%;
+    padding: 10px;
+  }
 </style>
+
+<main>
+
+  <UserSearch />
+
+  {#if users}
+  <ul class="user-list">
+    {#each users as user}
+      <li>
+        <User username={user.login} avatar={user.avatar_url} />
+      </li>
+    {/each}
+  </ul>
+  {/if}
+  
+</main>
